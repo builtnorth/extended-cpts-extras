@@ -7,12 +7,12 @@ if (!function_exists('extended_post_type_extras')) {
 
 		foreach ($post_types as $post_type) {
 			// Handle featured image width
-			if (!empty($options['featured_image_width'])) {
+			if (!empty($options['featured_image_column_width'])) {
 				add_action('admin_head', function () use ($post_type, $options) {
-					$width = $options['featured_image_width'];
+					$width = $options['featured_image_column_width'];
 					echo "<style>
-						.post-type-{$post_type} .column-featured_image { width: {$width}px; }
-						.post-type-{$post_type} .column-featured_image img { width: {$width}px; height: {$width}px; object-fit: cover; }
+						.post-type-{$post_type} .column-featured_image { width: {$width}; }
+						.post-type-{$post_type} .column-featured_image img {  aspect-ratio: 4 / 3; object-fit: cover; }
 					</style>";
 				});
 			}
