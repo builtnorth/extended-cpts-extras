@@ -3,20 +3,26 @@
 if (!function_exists('extended_post_type_extras')) {
 	function extended_post_type_extras($post_types, $options = [])
 	{
-		// Convert single post type to array if necessary
 		$post_types = (array) $post_types;
 
 		foreach ($post_types as $post_type) {
+			// Handle featured image width
 			if (!empty($options['featured_image_width'])) {
-				add_action('admin_head', function () use ($post_type, $options) {
-					$width = $options['featured_image_width'];
-					echo "<style>
-						.post-type-{$post_type} .column-featured_image { width: {$width}px; }
-						.post-type-{$post_type} .column-featured_image img { width: {$width}px; height: {$width}px; object-fit: cover; }
-					</style>";
+				add_filter('admin_post_thumbnail_size', function ($size) use ($options) {
+					return ['width' => $options['featured_image_width'], 'height' => $options['featured_image_width']];
+				});
+
+				add_action('admin_head', function () use ($options) {
+					echo '<style>
+						.column-featured_image img {
+							width: ' . $options['featured_image_width'] . 'px;
+							height: auto;
+						}
+					</style>';
 				});
 			}
 
+			// Remove meta boxes
 			if (!empty($options['remove_meta_boxes'])) {
 				add_action('add_meta_boxes', function () use ($post_type, $options) {
 					foreach ($options['remove_meta_boxes'] as $meta_box) {
@@ -27,22 +33,46 @@ if (!function_exists('extended_post_type_extras')) {
 				}, 20);
 			}
 
+			// Register meta
 			if (!empty($options['register_meta'])) {
-				add_action('init', function () use ($post_type, $options) {
+				$register_meta = function () use ($post_type, $options) {
 					foreach ($options['register_meta'] as $meta_key => $meta_args) {
 						$args = array_merge([
-							'object_subtype' => $post_type,
-							'type' => 'string',
-							'single' => true,
 							'show_in_rest' => true,
+							'single' => true,
+							'type' => 'string',
+							'description' => '',
 						], $meta_args);
 
-						register_meta('post', sanitize_key($meta_key), $args);
-					}
-				});
-			}
+						if (!isset($args['sanitize_callback'])) {
+							$args['sanitize_callback'] = get_default_sanitize_callback($args['type']);
+						}
 
-			// Add more custom options handling here as needed
+						register_post_meta($post_type, $meta_key, $args);
+					}
+				};
+
+				add_action('init', $register_meta);
+				add_action('rest_api_init', $register_meta);
+			}
+		}
+	}
+}
+
+if (!function_exists('get_default_sanitize_callback')) {
+	function get_default_sanitize_callback($type)
+	{
+		switch ($type) {
+			case 'boolean':
+				return 'rest_sanitize_boolean';
+			case 'integer':
+				return 'absint';
+			case 'number':
+				return 'floatval';
+			case 'array':
+				return 'rest_sanitize_array';
+			default:
+				return 'sanitize_text_field';
 		}
 	}
 }
