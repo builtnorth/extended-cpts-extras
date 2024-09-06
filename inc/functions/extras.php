@@ -8,17 +8,12 @@ if (!function_exists('extended_post_type_extras')) {
 		foreach ($post_types as $post_type) {
 			// Handle featured image width
 			if (!empty($options['featured_image_width'])) {
-				add_filter('admin_post_thumbnail_size', function ($size) use ($options) {
-					return ['width' => $options['featured_image_width'], 'height' => $options['featured_image_width']];
-				});
-
-				add_action('admin_head', function () use ($options) {
-					echo '<style>
-						.column-featured_image img {
-							width: ' . $options['featured_image_width'] . 'px;
-							height: auto;
-						}
-					</style>';
+				add_action('admin_head', function () use ($post_type, $options) {
+					$width = $options['featured_image_width'];
+					echo "<style>
+						.post-type-{$post_type} .column-featured_image { width: {$width}px; }
+						.post-type-{$post_type} .column-featured_image img { width: {$width}px; height: {$width}px; object-fit: cover; }
+					</style>";
 				});
 			}
 
