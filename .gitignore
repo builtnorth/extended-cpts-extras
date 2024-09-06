@@ -1,0 +1,48 @@
+# Various things
+.sass-cache
+node_modules
+.ftppass
+sftpCache.json
+bower_components
+.DS_Store
+bin/tasks
+_srcMaps/
+
+# Exclude composer dependencies in the vendor directory
+/vendor
+
+# Log files
+*.log
+
+#various
+wp-content/uploads/sites/*/gravity_forms
+wp-content/uploads/sites/*/wp-migrate-db
+wp-content/uploads/wpo-plugins-tables-list.json
+
+
+
+# Project Files
+dist
+backstop_data
+
+# Editors
+*.esproj
+*.tmproj
+*.tmproject
+tmtags
+.*.sw[a-z]
+*.un~
+Session.vim
+*.swp
+.vscode
+
+# Mac OSX
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Desktop.ini
+/debug.log
