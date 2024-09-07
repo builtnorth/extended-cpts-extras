@@ -29,16 +29,16 @@ Use the `extended_post_type_extras()` function to apply extra configurations to 
 
 ```php
 extended_post_type_extras(['post', 'page'], [
-'featured_image_column_width' => 80,
-'remove_meta_boxes' => ['postcustom', 'commentstatusdiv'],
-'register_meta' => [
-	'my_custom_field' => [
-	'type' => 'string',
-	'description' => 'A custom field for this post type',
-	'single' => true,
-	'show_in_rest' => true,
-	],
-]
+	'featured_image_column_width' => 80,
+	'remove_meta_boxes' => ['postcustom', 'commentstatusdiv'],
+	'register_meta' => [
+		'my_custom_field' => [
+			'type' => 'string',
+			'description' => 'A custom field for this post type',
+			'single' => true,
+			'show_in_rest' => true,
+		],
+	]
 ]);
 ```
 
@@ -52,7 +52,7 @@ Parameters:
 
 -   `$post_types`: String or array of post type names
 -   `$options`: Array of configuration options
-    -   `featured_image_width`: Set width for featured image column
+    -   `featured_image_column_width`: Set width for featured image column
     -   `remove_meta_boxes`: Array of meta box IDs to remove
     -   `register_meta`: Array of meta fields to register
 
