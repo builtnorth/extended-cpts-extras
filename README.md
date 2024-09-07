@@ -29,7 +29,7 @@ Use the `extended_post_type_extras()` function to apply extra configurations to 
 
 ```php
 extended_post_type_extras(['post', 'page'], [
-'featured_image_width' => 80,
+'featured_image_column_width' => 80,
 'remove_meta_boxes' => ['postcustom', 'commentstatusdiv'],
 'register_meta' => [
 	'my_custom_field' => [
