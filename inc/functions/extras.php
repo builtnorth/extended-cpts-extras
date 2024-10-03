@@ -11,7 +11,7 @@ if (!function_exists('extended_post_type_extras')) {
 				add_action('admin_head', function () use ($post_type, $options) {
 					$width = $options['featured_image_column_width'];
 					echo "<style>
-						.post-type-{$post_type} .column-featured_image { width: {$width}; }
+						.post-type-{$post_type} .column-featured_image { width: {$width}px; }
 						.post-type-{$post_type} .column-featured_image img {  aspect-ratio: 4 / 3; object-fit: cover; }
 					</style>";
 				});
