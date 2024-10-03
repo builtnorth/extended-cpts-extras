@@ -7,7 +7,8 @@ Extended CPTs Extras is a companion package for the [Extended CPTs](https://gith
 1. **Featured Image Column Width**: Customize the width of the featured image column in the admin list view.
 2. **Remove Meta Boxes**: Easily remove unwanted meta boxes from the post edit screen (useful for Gutenberg).
 3. **Register Meta**: Register custom meta fields for your post types with support for the REST API.
-4. **Modify Existing Post Types**: Add additional features to existing post types, including:
+4. **Modify Existing Post Types**: Add additional features to existing post types. Note that the the below features work correctly out of the box on the Extended CPTs package when registeting a **new** post type. It is only necessary to use the `extended_post_type_modify_existing()` function when modifying an **existing** post type. Theses features include:
+
     - Custom templates
     - Template locking
     - Menu position
@@ -19,9 +20,9 @@ Extended CPTs Extras is a companion package for the [Extended CPTs](https://gith
 
     ```json
     {
-        "require": {
-            "builtnorth/extended-cpts-extras": "^1.0"
-        }
+    	"require": {
+    		"builtnorth/extended-cpts-extras": "^1.0"
+    	}
     }
     ```
 
