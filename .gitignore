@@ -10,6 +10,7 @@ _srcMaps/
 
 # Exclude composer dependencies in the vendor directory
 /vendor
+composer.lock
 
 # Log files
 *.log
