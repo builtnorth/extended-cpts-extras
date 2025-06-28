@@ -68,22 +68,22 @@ Apply extra configurations to specified post types.
 
 Parameters:
 
--   `$post_types`: String or array of post type names
--   `$options`: Array of configuration options
-    -   `featured_image_column_width`: Set width for featured image column
-    -   `remove_meta_boxes`: Array of meta box IDs to remove
-    -   `register_meta`: Array of meta fields to register
+- `$post_types`: String or array of post type names
+- `$options`: Array of configuration options
+    - `featured_image_column_width`: Set width for featured image column
+    - `remove_meta_boxes`: Array of meta box IDs to remove
+    - `register_meta`: Array of meta fields to register
 
 ### extended_post_type_modify_existing($post_types, $options)
 
 Modify existing post types with additional features that are not available in the original Extended CPTs package. This function allows you to apply certain options to existing post types that normally only work when registering a new post type with `register_extended_post_type()`. Specifically, it enables you to modify the following attributes for existing post types:
 
--   `$post_types`: String or array of post type names
--   `$options`: Array of configuration options
-    -   `template`: Custom template for the post type
-    -   `template_lock`: Lock the template to prevent changes
-    -   `menu_position`: Set the menu position
-    -   `menu_icon`: Set the menu icon
+- `$post_types`: String or array of post type names
+- `$options`: Array of configuration options
+    - `template`: Custom template for the post type
+    - `template_lock`: Lock the template to prevent changes
+    - `menu_position`: Set the menu position
+    - `menu_icon`: Set the menu icon
 
 ## Contributing
 
