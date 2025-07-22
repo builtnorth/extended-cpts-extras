@@ -1,0 +1,226 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Is this a pre-release?'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  # Package-specific configuration - customize these for each package
+  PACKAGE_NAME: ${{ vars.PACKAGE_NAME || 'wp-utility' }}
+  PACKAGE_DISPLAY_NAME: ${{ vars.PACKAGE_DISPLAY_NAME || 'WP Utility' }}
+  COMPOSER_NAMESPACE: ${{ vars.COMPOSER_NAMESPACE || 'builtnorth/wp-utility' }}
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            if [[ ! "$VERSION" =~ ^v ]]; then
+              VERSION="v$VERSION"
+            fi
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_number=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+
+      - name: Update composer.json version
+        if: contains(fromJSON('["composer.json", "package.json"]'), 'composer.json')
+        run: |
+          if [ -f composer.json ]; then
+            jq '.version = "${{ steps.version.outputs.version_number }}"' composer.json > composer.tmp.json
+            mv composer.tmp.json composer.json
+          fi
+
+      - name: Update package.json version
+        if: contains(fromJSON('["package.json"]'), 'package.json')
+        run: |
+          if [ -f package.json ]; then
+            npm version ${{ steps.version.outputs.version_number }} --no-git-tag-version --allow-same-version
+          fi
+
+      - name: Commit version updates
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if [ -f composer.json ]; then
+            git add composer.json
+          fi
+          if [ -f package.json ]; then
+            git add package.json package-lock.json
+          fi
+          
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: bump version to ${{ steps.version.outputs.version_number }}"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Create and push tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git tag -a ${{ steps.version.outputs.version }} -m "Release ${{ steps.version.outputs.version }}"
+          git push origin ${{ steps.version.outputs.version }}
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ steps.version.outputs.version }}^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, including all commits"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --reverse)
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to ${{ steps.version.outputs.version }}"
+            COMMITS=$(git log ${PREVIOUS_TAG}..${{ steps.version.outputs.version }} --pretty=format:"- %s (%h)" --reverse)
+          fi
+          
+          # Format changelog
+          CHANGELOG="## What's Changed in ${{ env.PACKAGE_DISPLAY_NAME }} ${{ steps.version.outputs.version }}"
+          CHANGELOG="$CHANGELOG"$'\n\n'
+          
+          # Group commits by type
+          FEATURES=$(echo "$COMMITS" | grep -E "^- (feat|feature):" || true)
+          FIXES=$(echo "$COMMITS" | grep -E "^- (fix|bugfix):" || true)
+          DOCS=$(echo "$COMMITS" | grep -E "^- (docs|documentation):" || true)
+          STYLE=$(echo "$COMMITS" | grep -E "^- (style|formatting):" || true)
+          REFACTOR=$(echo "$COMMITS" | grep -E "^- (refactor|refactoring):" || true)
+          TEST=$(echo "$COMMITS" | grep -E "^- (test|tests):" || true)
+          CHORE=$(echo "$COMMITS" | grep -E "^- (chore|build|ci):" || true)
+          OTHER=$(echo "$COMMITS" | grep -vE "^- (feat|feature|fix|bugfix|docs|documentation|style|formatting|refactor|refactoring|test|tests|chore|build|ci):" || true)
+          
+          if [ -n "$FEATURES" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### 🚀 Features"$'\n'"$FEATURES"$'\n'
+          fi
+          if [ -n "$FIXES" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### 🐛 Bug Fixes"$'\n'"$FIXES"$'\n'
+          fi
+          if [ -n "$DOCS" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### 📚 Documentation"$'\n'"$DOCS"$'\n'
+          fi
+          if [ -n "$REFACTOR" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### ♻️ Refactoring"$'\n'"$REFACTOR"$'\n'
+          fi
+          if [ -n "$TEST" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### ✅ Tests"$'\n'"$TEST"$'\n'
+          fi
+          if [ -n "$CHORE" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### 🔧 Maintenance"$'\n'"$CHORE"$'\n'
+          fi
+          if [ -n "$OTHER" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### 📦 Other Changes"$'\n'"$OTHER"$'\n'
+          fi
+          
+          CHANGELOG="$CHANGELOG"$'\n'"**Full Changelog**: "
+          if [ -n "$PREVIOUS_TAG" ]; then
+            CHANGELOG="$CHANGELOG""https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...${{ steps.version.outputs.version }}"
+          else
+            CHANGELOG="$CHANGELOG""https://github.com/${{ github.repository }}/commits/${{ steps.version.outputs.version }}"
+          fi
+          
+          # Save to file for the release
+          echo "$CHANGELOG" > release_notes.md
+
+      - name: Create release archive
+        run: |
+          # Create a clean release directory
+          mkdir -p release-archive
+          
+          # Copy all files except those that should be excluded
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='composer.lock' \
+            --exclude='release-archive' \
+            --exclude='release_notes.md' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='tests' \
+            --exclude='docs' \
+            --exclude='examples' \
+            --exclude='build' \
+            --exclude='.vscode' \
+            --exclude='.idea' \
+            --exclude='*.log' \
+            --exclude='.DS_Store' \
+            --exclude='Thumbs.db' \
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='phpunit.xml*' \
+            --exclude='phpstan.neon*' \
+            --exclude='.phpcs.xml*' \
+            --exclude='Makefile' \
+            --exclude='*.md' \
+            . release-archive/
+          
+          # Create zip archive
+          cd release-archive
+          zip -r ../${{ env.PACKAGE_NAME }}-${{ steps.version.outputs.version_number }}.zip .
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ env.PACKAGE_DISPLAY_NAME }} ${{ steps.version.outputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          generate_release_notes: false
+          files: |
+            ${{ env.PACKAGE_NAME }}-${{ steps.version.outputs.version_number }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release summary
+        if: success()
+        run: |
+          echo "✅ Release created successfully!"
+          echo ""
+          echo "📦 To use this version in other packages:"
+          echo ""
+          echo "    \"require\": {"
+          echo "        \"${{ env.COMPOSER_NAMESPACE }}\": \"${{ steps.version.outputs.version_number }}\""
+          echo "    }"
+          echo ""
+          echo "With VCS repository:"
+          echo "    \"repositories\": ["
+          echo "        {"
+          echo "            \"type\": \"vcs\","
+          echo "            \"url\": \"https://github.com/${{ github.repository }}\""
+          echo "        }"
+          echo "    ]"
