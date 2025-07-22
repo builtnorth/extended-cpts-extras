@@ -18,9 +18,9 @@ on:
 
 env:
   # Package-specific configuration - customize these for each package
-  PACKAGE_NAME: ${{ vars.PACKAGE_NAME || 'wp-utility' }}
-  PACKAGE_DISPLAY_NAME: ${{ vars.PACKAGE_DISPLAY_NAME || 'WP Utility' }}
-  COMPOSER_NAMESPACE: ${{ vars.COMPOSER_NAMESPACE || 'builtnorth/wp-utility' }}
+  PACKAGE_NAME: ${{ vars.PACKAGE_NAME || 'extended-cpts-extras' }}
+  PACKAGE_DISPLAY_NAME: ${{ vars.PACKAGE_DISPLAY_NAME || 'Extended CPTs Extras' }}
+  COMPOSER_NAMESPACE: ${{ vars.COMPOSER_NAMESPACE || 'builtnorth/extended-cpts-extras' }}
 
 jobs:
   release:
