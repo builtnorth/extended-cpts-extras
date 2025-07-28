@@ -59,7 +59,12 @@ if (!function_exists('extended_post_type_extras')) {
 						], $meta_args);
 
 						if (!isset($args['sanitize_callback'])) {
-							$args['sanitize_callback'] = get_default_sanitize_callback($args['type']);
+							$callback = get_default_sanitize_callback($args['type']);
+							// Only set sanitize_callback if we have a non-null value
+							// WordPress will use its internal type-based sanitization for null
+							if ($callback !== null) {
+								$args['sanitize_callback'] = $callback;
+							}
 						}
 
 						register_post_meta($post_type, $meta_key, $args);
@@ -77,7 +82,7 @@ if (!function_exists('extended_post_type_extras')) {
  * Get the default sanitize callback for the given type
  *
  * @param string $type
- * @return string
+ * @return string|callable
  */
 if (!function_exists('get_default_sanitize_callback')) {
 	function get_default_sanitize_callback($type)
@@ -88,7 +93,9 @@ if (!function_exists('get_default_sanitize_callback')) {
 			case 'integer':
 				return 'absint';
 			case 'number':
-				return 'floatval';
+				// For number type, use absint as most number fields in WordPress are IDs
+				// If you need decimals, you should explicitly set a custom sanitize_callback
+				return 'absint';
 			case 'array':
 				return 'rest_sanitize_array';
 			default:
