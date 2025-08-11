@@ -124,25 +124,25 @@ jobs:
           OTHER=$(echo "$COMMITS" | grep -vE "^- (feat|feature|fix|bugfix|docs|documentation|style|formatting|refactor|refactoring|test|tests|chore|build|ci):" || true)
           
           if [ -n "$FEATURES" ]; then
-            CHANGELOG="$CHANGELOG"$'\n'"### 🚀 Features"$'\n'"$FEATURES"$'\n'
+            CHANGELOG="$CHANGELOG"$'\n'"### Features"$'\n'"$FEATURES"$'\n'
           fi
           if [ -n "$FIXES" ]; then
-            CHANGELOG="$CHANGELOG"$'\n'"### 🐛 Bug Fixes"$'\n'"$FIXES"$'\n'
+            CHANGELOG="$CHANGELOG"$'\n'"### Bug Fixes"$'\n'"$FIXES"$'\n'
           fi
           if [ -n "$DOCS" ]; then
-            CHANGELOG="$CHANGELOG"$'\n'"### 📚 Documentation"$'\n'"$DOCS"$'\n'
+            CHANGELOG="$CHANGELOG"$'\n'"### Documentation"$'\n'"$DOCS"$'\n'
           fi
           if [ -n "$REFACTOR" ]; then
-            CHANGELOG="$CHANGELOG"$'\n'"### ♻️ Refactoring"$'\n'"$REFACTOR"$'\n'
+            CHANGELOG="$CHANGELOG"$'\n'"### Refactoring"$'\n'"$REFACTOR"$'\n'
           fi
           if [ -n "$TEST" ]; then
-            CHANGELOG="$CHANGELOG"$'\n'"### ✅ Tests"$'\n'"$TEST"$'\n'
+            CHANGELOG="$CHANGELOG"$'\n'"### Tests"$'\n'"$TEST"$'\n'
           fi
           if [ -n "$CHORE" ]; then
-            CHANGELOG="$CHANGELOG"$'\n'"### 🔧 Maintenance"$'\n'"$CHORE"$'\n'
+            CHANGELOG="$CHANGELOG"$'\n'"### Maintenance"$'\n'"$CHORE"$'\n'
           fi
           if [ -n "$OTHER" ]; then
-            CHANGELOG="$CHANGELOG"$'\n'"### 📦 Other Changes"$'\n'"$OTHER"$'\n'
+            CHANGELOG="$CHANGELOG"$'\n'"### Other Changes"$'\n'"$OTHER"$'\n'
           fi
           
           CHANGELOG="$CHANGELOG"$'\n'"**Full Changelog**: "
@@ -196,7 +196,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ env.PACKAGE_DISPLAY_NAME }} ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
           body_path: release_notes.md
           draft: false
           prerelease: ${{ github.event.inputs.prerelease == 'true' }}
@@ -209,9 +209,9 @@ jobs:
       - name: Release summary
         if: success()
         run: |
-          echo "✅ Release created successfully!"
+          echo "Release created successfully!"
           echo ""
-          echo "📦 To use this version in other packages:"
+          echo "To use this version in other packages:"
           echo ""
           echo "    \"require\": {"
           echo "        \"${{ env.COMPOSER_NAMESPACE }}\": \"${{ steps.version.outputs.version_number }}\""
