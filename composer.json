@@ -16,7 +16,7 @@
     "10up/wp_mock": "^1.0",
     "mockery/mockery": "^1.5",
     "phpunit/phpunit": "^9.0",
-    "builtnorth/coding-standards": "*"
+    "builtnorth/coding-standards": "^1.0"
   },
   "autoload": {
     "psr-4": {
