@@ -12,6 +12,12 @@
   "require": {
     "php": ">=8.1"
   },
+  "require-dev": {
+    "10up/wp_mock": "^1.0",
+    "mockery/mockery": "^1.5",
+    "phpunit/phpunit": "^9.0",
+    "builtnorth/coding-standards": "*"
+  },
   "autoload": {
     "psr-4": {
       "BuiltNorth\\ExtendedCPTsExtras\\": "inc/classes"
@@ -21,5 +27,29 @@
       "inc/functions/modify.php"
     ]
   },
-  "version": "1.2.0"
+  "autoload-dev": {
+    "psr-4": {
+      "BuiltNorth\\ExtendedCPTsExtras\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "test:unit": "phpunit --testsuite Unit",
+    "test:coverage": "phpunit --coverage-html coverage",
+    "lint": "phpcs",
+    "lint:fix": "phpcbf",
+    "phpcs": "phpcs",
+    "phpcs:summary": "phpcs --report=summary",
+    "phpcbf": "phpcbf",
+    "phpcompat": "phpcs -p inc --standard=PHPCompatibility --runtime-set testVersion 8.1-"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    },
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

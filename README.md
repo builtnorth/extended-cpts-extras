@@ -7,7 +7,8 @@ Extended CPTs Extras is a companion package for the [Extended CPTs](https://gith
 1. **Featured Image Column Width**: Customize the width of the featured image column in the admin list view.
 2. **Remove Meta Boxes**: Easily remove unwanted meta boxes from the post edit screen (useful for Gutenberg).
 3. **Register Meta**: Register custom meta fields for your post types with support for the REST API.
-4. **Modify Existing Post Types**: Add additional features to existing post types. Note that the the below features work correctly out of the box on the Extended CPTs package when registeting a **new** post type. It is only necessary to use the `extended_post_type_modify_existing()` function when modifying an **existing** post type. Theses features include:
+4. **Register Block Bindings**: Register custom block binding sources for dynamic content in blocks.
+5. **Modify Existing Post Types**: Add additional features to existing post types. Note that the the below features work correctly out of the box on the Extended CPTs package when registeting a **new** post type. It is only necessary to use the `extended_post_type_modify_existing()` function when modifying an **existing** post type. Theses features include:
 
     - Custom templates
     - Template locking
@@ -43,6 +44,16 @@ extended_post_type_extras(['post', 'page'], [
 			'single' => true,
 			'show_in_rest' => true,
 		],
+	],
+	'register_block_bindings' => [
+		'my_custom_source' => [
+			'label' => 'My Custom Source',
+			'get_value_callback' => function($source_args, $block_instance) {
+				// Return dynamic content based on source_args
+				return get_post_meta($block_instance->context['postId'], $source_args['key'], true);
+			},
+			'uses_context' => ['postId', 'postType'],
+		],
 	]
 ]);
 ```
@@ -68,22 +79,23 @@ Apply extra configurations to specified post types.
 
 Parameters:
 
-- `$post_types`: String or array of post type names
-- `$options`: Array of configuration options
-    - `featured_image_column_width`: Set width for featured image column
-    - `remove_meta_boxes`: Array of meta box IDs to remove
-    - `register_meta`: Array of meta fields to register
+-   `$post_types`: String or array of post type names
+-   `$options`: Array of configuration options
+    -   `featured_image_column_width`: Set width for featured image column
+    -   `remove_meta_boxes`: Array of meta box IDs to remove
+    -   `register_meta`: Array of meta fields to register
+    -   `register_block_bindings`: Array of block binding sources to register
 
 ### extended_post_type_modify_existing($post_types, $options)
 
 Modify existing post types with additional features that are not available in the original Extended CPTs package. This function allows you to apply certain options to existing post types that normally only work when registering a new post type with `register_extended_post_type()`. Specifically, it enables you to modify the following attributes for existing post types:
 
-- `$post_types`: String or array of post type names
-- `$options`: Array of configuration options
-    - `template`: Custom template for the post type
-    - `template_lock`: Lock the template to prevent changes
-    - `menu_position`: Set the menu position
-    - `menu_icon`: Set the menu icon
+-   `$post_types`: String or array of post type names
+-   `$options`: Array of configuration options
+    -   `template`: Custom template for the post type
+    -   `template_lock`: Lock the template to prevent changes
+    -   `menu_position`: Set the menu position
+    -   `menu_icon`: Set the menu icon
 
 ## Contributing
 
