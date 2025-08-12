@@ -143,7 +143,7 @@ if (!function_exists('get_default_sanitize_callback')) {
 			case 'array':
 				return 'rest_sanitize_array';
 			default:
-				return 'sanitize_text_field';
+				return 'wp_kses_post';
 		}
 	}
 }
