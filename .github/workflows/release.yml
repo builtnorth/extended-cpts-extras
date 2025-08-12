@@ -56,13 +56,8 @@ jobs:
           php-version: '8.2'
           tools: composer:v2
 
-      - name: Update composer.json version
-        if: contains(fromJSON('["composer.json", "package.json"]'), 'composer.json')
-        run: |
-          if [ -f composer.json ]; then
-            jq '.version = "${{ steps.version.outputs.version_number }}"' composer.json > composer.tmp.json
-            mv composer.tmp.json composer.json
-          fi
+      # Skip composer.json version update - version tracked via git tags only
+      # This prevents merge conflicts between branches
 
       - name: Update package.json version
         if: contains(fromJSON('["package.json"]'), 'package.json')
@@ -77,9 +72,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          if [ -f composer.json ]; then
-            git add composer.json
-          fi
+          # Skip adding composer.json - version tracked via git tags only
           if [ -f package.json ]; then
             git add package.json package-lock.json
           fi
