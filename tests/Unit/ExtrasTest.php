@@ -69,8 +69,14 @@ class ExtrasTest extends TestCase {
 	 * Test extended_post_type_extras register meta
 	 */
 	public function test_extended_post_type_extras_register_meta() {
+		// Mock did_action to return false (not in init yet)
+		WP_Mock::userFunction( 'did_action', [
+			'args' => [ 'init' ],
+			'return' => false
+		] );
+
 		WP_Mock::expectActionAdded( 'init', WP_Mock\Functions::type( 'callable' ) );
-		
+
 		extended_post_type_extras( 'post', [
 			'register_meta' => [
 				'test_meta' => [
@@ -80,7 +86,7 @@ class ExtrasTest extends TestCase {
 				]
 			]
 		] );
-		
+
 		$this->assertConditionsMet();
 	}
 
@@ -121,10 +127,16 @@ class ExtrasTest extends TestCase {
 	 * Test extended_post_type_extras with all options
 	 */
 	public function test_extended_post_type_extras_all_options() {
+		// Mock did_action to return false (not in init yet)
+		WP_Mock::userFunction( 'did_action', [
+			'args' => [ 'init' ],
+			'return' => false
+		] );
+
 		WP_Mock::expectActionAdded( 'admin_head', WP_Mock\Functions::type( 'callable' ) );
 		WP_Mock::expectActionAdded( 'add_meta_boxes', WP_Mock\Functions::type( 'callable' ), 20 );
 		WP_Mock::expectActionAdded( 'init', WP_Mock\Functions::type( 'callable' ) );
-		
+
 		extended_post_type_extras( 'custom_post', [
 			'featured_image_column_width' => 150,
 			'remove_meta_boxes' => [ 'authordiv' ],
@@ -140,7 +152,36 @@ class ExtrasTest extends TestCase {
 				]
 			]
 		] );
-		
+
+		$this->assertConditionsMet();
+	}
+
+	/**
+	 * Test extended_post_type_extras register meta when already in init hook
+	 */
+	public function test_extended_post_type_extras_register_meta_during_init() {
+		// Mock did_action to return true (already in init)
+		WP_Mock::userFunction( 'did_action', [
+			'args' => [ 'init' ],
+			'return' => 1
+		] );
+
+		// Mock register_post_meta since it will be called directly
+		WP_Mock::userFunction( 'register_post_meta', [
+			'args' => [ 'post', 'test_meta', WP_Mock\Functions::type( 'array' ) ],
+			'return' => true
+		] );
+
+		extended_post_type_extras( 'post', [
+			'register_meta' => [
+				'test_meta' => [
+					'type' => 'string',
+					'single' => true,
+					'show_in_rest' => true
+				]
+			]
+		] );
+
 		$this->assertConditionsMet();
 	}
 }
