@@ -10,13 +10,13 @@
     }
   ],
   "require": {
-    "php": ">=8.1"
+    "php": ">=8.0"
   },
   "require-dev": {
     "10up/wp_mock": "^1.0",
     "mockery/mockery": "^1.5",
     "phpunit/phpunit": "^9.0",
-    "builtnorth/coding-standards": "*"
+    "builtnorth/coding-standards": "^1.0"
   },
   "autoload": {
     "psr-4": {
@@ -51,5 +51,10 @@
     "sort-packages": true
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.0.x-dev"
+    }
+  }
 }

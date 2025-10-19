@@ -79,8 +79,55 @@ if (!function_exists('extended_post_type_extras')) {
 					}
 				};
 
-				add_action('init', $register_meta);
-				add_action('rest_api_init', $register_meta);
+				// Check if we're already inside the init hook
+				if (did_action('init')) {
+					// We're already in init, call directly
+					$register_meta();
+				} else {
+					// We're before init, add hooks
+					add_action('init', $register_meta);
+					add_action('rest_api_init', $register_meta);
+				}
+			}
+
+			// Handle admin columns for global registration
+			if (!empty($options['admin_cols']) && ($post_type === '' || $post_type === null)) {
+				// For global admin columns, we need to apply to all public post types
+				add_action('init', function() use ($options) {
+					$public_post_types = get_post_types(['public' => true], 'names');
+					foreach ($public_post_types as $pt) {
+						// Apply admin columns to each post type
+						if (function_exists('register_extended_post_type')) {
+							add_filter("manage_{$pt}_posts_columns", function($columns) use ($options) {
+								foreach ($options['admin_cols'] as $col_key => $col_config) {
+									$columns[$col_key] = $col_config['title'] ?? $col_key;
+								}
+								return $columns;
+							}, 20);
+							
+							add_action("manage_{$pt}_posts_custom_column", function($column, $post_id) use ($options) {
+								if (isset($options['admin_cols'][$column])) {
+									$col_config = $options['admin_cols'][$column];
+									if (isset($col_config['function']) && is_callable($col_config['function'])) {
+										echo $col_config['function']($post_id);
+									} elseif (isset($col_config['meta_key'])) {
+										echo get_post_meta($post_id, $col_config['meta_key'], true);
+									}
+								}
+							}, 10, 2);
+							
+							// Make columns sortable if specified
+							add_filter("manage_edit-{$pt}_sortable_columns", function($columns) use ($options) {
+								foreach ($options['admin_cols'] as $col_key => $col_config) {
+									if (!empty($col_config['sortable'])) {
+										$columns[$col_key] = $col_config['meta_key'] ?? $col_key;
+									}
+								}
+								return $columns;
+							});
+						}
+					}
+				}, 99);
 			}
 
 			// Register block bindings

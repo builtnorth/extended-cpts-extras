@@ -1,0 +1,11 @@
+name: Scheduled CI
+
+on:
+  schedule:
+    # Run every Monday at 10:00 AM ET (2:00 PM UTC)
+    - cron: '0 14 * * 1'
+  workflow_dispatch:
+
+jobs:
+  scheduled-ci:
+    uses: builtnorth/.github/.github/workflows/composer-package-ci.yml@main
