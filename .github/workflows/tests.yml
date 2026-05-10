@@ -8,3 +8,4 @@ on:
 jobs:
   ci:
     uses: builtnorth/.github/.github/workflows/composer-package-ci.yml@main
+    secrets: inherit
