@@ -79,15 +79,8 @@ if (!function_exists('extended_post_type_extras')) {
 					}
 				};
 
-				// Check if we're already inside the init hook
-				if (did_action('init')) {
-					// We're already in init, call directly
-					$register_meta();
-				} else {
-					// We're before init, add hooks
-					add_action('init', $register_meta);
-					add_action('rest_api_init', $register_meta);
-				}
+				add_action('init', $register_meta);
+				add_action('rest_api_init', $register_meta);
 			}
 
 			// Handle admin columns for global registration
