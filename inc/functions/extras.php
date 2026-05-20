@@ -79,7 +79,14 @@ if (!function_exists('extended_post_type_extras')) {
 					}
 				};
 
-				add_action('init', $register_meta);
+				// Register immediately when already inside `init` (e.g. PostTypeAPI::register at priority 10).
+				// Otherwise the hook is added too late and meta (incl. block bindings) is missing until the next request.
+				if (did_action('init')) {
+					$register_meta();
+				} else {
+					add_action('init', $register_meta, 20);
+				}
+
 				add_action('rest_api_init', $register_meta);
 			}
 
