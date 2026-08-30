@@ -15,6 +15,46 @@
  */
 
 /**
+ * @return array<string, int>
+ */
+if (!function_exists('extended_cpts_extras_featured_image_styles')) {
+	function &extended_cpts_extras_featured_image_styles()
+	{
+		static $styles = [];
+
+		return $styles;
+	}
+
+	function extended_cpts_extras_print_featured_image_column_styles(): void
+	{
+		$styles = extended_cpts_extras_featured_image_styles();
+
+		if (empty($styles)) {
+			return;
+		}
+
+		echo "<style>\n";
+
+		foreach ($styles as $post_type => $width) {
+			$post_type = esc_attr($post_type);
+			echo ".post-type-{$post_type} .column-featured_image { width: {$width}px; }\n";
+			echo ".post-type-{$post_type} .column-featured_image img { aspect-ratio: 4 / 3; object-fit: cover; }\n";
+		}
+
+		echo "@media screen and (max-width: 782px) {
+			.wp-list-table th.column-featured_image,
+			.wp-list-table td.column-featured_image {
+				display: none !important;
+				visibility: hidden !important;
+				height: 0 !important;
+				padding: 0 !important;
+			}
+		}
+		</style>";
+	}
+}
+
+/**
  * Add additional features to existing post types
  *
  * @param array $post_types
@@ -25,18 +65,22 @@ if (!function_exists('extended_post_type_extras')) {
 	{
 		$post_types = (array) $post_types;
 
-		foreach ($post_types as $post_type) {
-			// Handle featured image width
-			if (!empty($options['featured_image_column_width'])) {
-				add_action('admin_head', function () use ($post_type, $options) {
-					$width = $options['featured_image_column_width'];
-					echo "<style>
-						.post-type-{$post_type} .column-featured_image { width: {$width}px; }
-						.post-type-{$post_type} .column-featured_image img {  aspect-ratio: 4 / 3; object-fit: cover; }
-					</style>";
-				});
+		if (!empty($options['featured_image_column_width'])) {
+			$styles = &extended_cpts_extras_featured_image_styles();
+
+			foreach ($post_types as $post_type) {
+				$styles[$post_type] = (int) $options['featured_image_column_width'];
 			}
 
+			if (
+				function_exists('add_action')
+				&& !has_action('admin_head', 'extended_cpts_extras_print_featured_image_column_styles')
+			) {
+				add_action('admin_head', 'extended_cpts_extras_print_featured_image_column_styles');
+			}
+		}
+
+		foreach ($post_types as $post_type) {
 			// Remove meta boxes
 			if (!empty($options['remove_meta_boxes'])) {
 				add_action('add_meta_boxes', function () use ($post_type, $options) {
@@ -79,15 +123,15 @@ if (!function_exists('extended_post_type_extras')) {
 					}
 				};
 
-				// Check if we're already inside the init hook
+				// Register immediately when already inside `init` (e.g. PostTypeAPI::register at priority 10).
+				// Otherwise the hook is added too late and meta (incl. block bindings) is missing until the next request.
 				if (did_action('init')) {
-					// We're already in init, call directly
 					$register_meta();
 				} else {
-					// We're before init, add hooks
-					add_action('init', $register_meta);
-					add_action('rest_api_init', $register_meta);
+					add_action('init', $register_meta, 20);
 				}
+
+				add_action('rest_api_init', $register_meta);
 			}
 
 			// Handle admin columns for global registration
