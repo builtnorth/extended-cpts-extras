@@ -30,7 +30,11 @@ class ExtrasTest extends TestCase {
 	 * Test extended_post_type_extras handles single post type
 	 */
 	public function test_extended_post_type_extras_single_post_type() {
-		WP_Mock::expectActionAdded( 'admin_head', WP_Mock\Functions::type( 'callable' ) );
+		WP_Mock::userFunction( 'has_action', [
+			'args' => [ 'admin_head', 'extended_cpts_extras_print_featured_image_column_styles' ],
+			'return' => false,
+		] );
+		WP_Mock::expectActionAdded( 'admin_head', 'extended_cpts_extras_print_featured_image_column_styles' );
 		
 		extended_post_type_extras( 'custom_post', [
 			'featured_image_column_width' => 100
@@ -43,7 +47,11 @@ class ExtrasTest extends TestCase {
 	 * Test extended_post_type_extras handles multiple post types
 	 */
 	public function test_extended_post_type_extras_multiple_post_types() {
-		WP_Mock::expectActionAdded( 'admin_head', WP_Mock\Functions::type( 'callable' ), 10, 1 );
+		WP_Mock::userFunction( 'has_action', [
+			'args' => [ 'admin_head', 'extended_cpts_extras_print_featured_image_column_styles' ],
+			'return' => false,
+		] );
+		WP_Mock::expectActionAdded( 'admin_head', 'extended_cpts_extras_print_featured_image_column_styles' );
 		
 		extended_post_type_extras( [ 'post', 'page' ], [
 			'featured_image_column_width' => 120
@@ -75,7 +83,8 @@ class ExtrasTest extends TestCase {
 			'return' => false
 		] );
 
-		WP_Mock::expectActionAdded( 'init', WP_Mock\Functions::type( 'callable' ) );
+		WP_Mock::expectActionAdded( 'init', WP_Mock\Functions::type( 'callable' ), 20 );
+		WP_Mock::expectActionAdded( 'rest_api_init', WP_Mock\Functions::type( 'callable' ) );
 
 		extended_post_type_extras( 'post', [
 			'register_meta' => [
@@ -133,9 +142,15 @@ class ExtrasTest extends TestCase {
 			'return' => false
 		] );
 
-		WP_Mock::expectActionAdded( 'admin_head', WP_Mock\Functions::type( 'callable' ) );
+		WP_Mock::userFunction( 'has_action', [
+			'args' => [ 'admin_head', 'extended_cpts_extras_print_featured_image_column_styles' ],
+			'return' => false,
+		] );
+
+		WP_Mock::expectActionAdded( 'admin_head', 'extended_cpts_extras_print_featured_image_column_styles' );
 		WP_Mock::expectActionAdded( 'add_meta_boxes', WP_Mock\Functions::type( 'callable' ), 20 );
-		WP_Mock::expectActionAdded( 'init', WP_Mock\Functions::type( 'callable' ) );
+		WP_Mock::expectActionAdded( 'init', WP_Mock\Functions::type( 'callable' ), 20 );
+		WP_Mock::expectActionAdded( 'rest_api_init', WP_Mock\Functions::type( 'callable' ) );
 
 		extended_post_type_extras( 'custom_post', [
 			'featured_image_column_width' => 150,
@@ -171,6 +186,8 @@ class ExtrasTest extends TestCase {
 			'args' => [ 'post', 'test_meta', WP_Mock\Functions::type( 'array' ) ],
 			'return' => true
 		] );
+
+		WP_Mock::expectActionAdded( 'rest_api_init', WP_Mock\Functions::type( 'callable' ) );
 
 		extended_post_type_extras( 'post', [
 			'register_meta' => [
