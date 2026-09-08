@@ -233,6 +233,11 @@ if (!function_exists('get_default_sanitize_callback')) {
 				return 'absint';
 			case 'array':
 				return 'rest_sanitize_array';
+			case 'object':
+				// Objects (associative arrays) must not use wp_kses_post — that fatals in
+				// filter_block_content() when haystack is an array. Leave null so WordPress
+				// uses schema-based sanitization from show_in_rest.
+				return null;
 			default:
 				return 'wp_kses_post';
 		}
