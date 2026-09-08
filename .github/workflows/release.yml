@@ -25,5 +25,7 @@ jobs:
       composer-namespace: 'builtnorth/extended-cpts-extras'
       version: ${{ inputs.version }}
       prerelease: ${{ inputs.prerelease }}
+      composer-repository-profile: coding-standards-only
+    secrets: inherit
     permissions:
       contents: write
