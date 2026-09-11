@@ -1,0 +1,31 @@
+# Keep development-only files out of the distributed package.
+#
+# Production installs land in a plugin's vendor/ inside the webroot, so anything
+# shipped here is potentially reachable over HTTP.
+#
+# This applies to `git archive` and Composer dist installs (the production path).
+# It does NOT apply to --prefer-source or path/symlink repositories.
+
+/tests/                 export-ignore
+/docs/                  export-ignore
+/examples/              export-ignore
+/bin/                   export-ignore
+/shims/                 export-ignore
+/.github/               export-ignore
+/.gitattributes         export-ignore
+/.gitignore             export-ignore
+/phpunit.xml            export-ignore
+/phpunit.xml.dist       export-ignore
+/phpunit-coverage.xml   export-ignore
+/.phpunit.result.cache  export-ignore
+/.phpunit.cache/        export-ignore
+/phpcs.xml              export-ignore
+/.phpcs.xml.dist        export-ignore
+/phpstan.neon           export-ignore
+/phpstan.neon.dist      export-ignore
+/patchwork.json         export-ignore
+/CONTRIBUTING.md        export-ignore
+/FUTURE-COMMANDS.md     export-ignore
+/webpack.config.js      export-ignore
+/webpack.*.js           export-ignore
+/__webpack.config.js    export-ignore
