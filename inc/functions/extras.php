@@ -25,6 +25,19 @@ if (!function_exists('extended_cpts_extras_featured_image_styles')) {
 		return $styles;
 	}
 
+	/**
+	 * Bust the per-process featured-image-column-width registry.
+	 *
+	 * Tests exercising extended_post_type_extras() must call this in setUp() —
+	 * the registry above is a function-local static, so a post type registered
+	 * by one test leaks into every later test in the same process otherwise.
+	 */
+	function extended_cpts_extras_reset_featured_image_styles(): void
+	{
+		$styles = &extended_cpts_extras_featured_image_styles();
+		$styles = [];
+	}
+
 	function extended_cpts_extras_print_featured_image_column_styles(): void
 	{
 		$styles = extended_cpts_extras_featured_image_styles();

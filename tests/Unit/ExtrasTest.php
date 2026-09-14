@@ -17,12 +17,24 @@ use Mockery;
 class ExtrasTest extends TestCase {
 
 	/**
+	 * Set up before each test
+	 */
+	public function setUp(): void {
+		parent::setUp();
+
+		// Load the functions file
+		require_once dirname( dirname( __DIR__ ) ) . '/inc/functions/extras.php';
+
+		// extended_cpts_extras_featured_image_styles() is a function-local
+		// static registry — bust it so a post type registered by one test
+		// doesn't leak into the next test's assertions in the same process.
+		extended_cpts_extras_reset_featured_image_styles();
+	}
+
+	/**
 	 * Test extended_post_type_extras function exists
 	 */
 	public function test_extended_post_type_extras_exists() {
-		// Load the functions file
-		require_once dirname( dirname( __DIR__ ) ) . '/inc/functions/extras.php';
-		
 		$this->assertTrue( function_exists( 'extended_post_type_extras' ) );
 	}
 
