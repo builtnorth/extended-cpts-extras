@@ -22,7 +22,7 @@ class ModifyTest extends TestCase {
 	 */
 	public function test_extended_post_type_modify_existing_exists() {
 		// Load the functions file
-		require_once dirname( dirname( __DIR__ ) ) . '/inc/functions/modify.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/inc/public-api.php';
 		
 		$this->assertTrue( function_exists( 'extended_post_type_modify_existing' ) );
 	}

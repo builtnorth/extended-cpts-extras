@@ -22,12 +22,11 @@
   },
   "autoload": {
     "psr-4": {
-      "BuiltNorth\\ExtendedCPTsExtras\\": "inc/classes"
+      "BuiltNorth\\ExtendedCPTsExtras\\": "inc/classes/"
     },
     "files": [
-      "bootstrap/register.php",
-      "inc/functions/extras.php",
-      "inc/functions/modify.php"
+      "register.php",
+      "inc/public-api.php"
     ]
   },
   "autoload-dev": {

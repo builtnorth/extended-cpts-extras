@@ -31,8 +31,8 @@ use Novalis\PackageLoader\Registry;
 if (class_exists(Registry::class, false)) {
 	Registry::instance()->register([
 		'package' => 'builtnorth/extended-cpts-extras',
-		'version' => (string) require dirname(__DIR__) . '/version.php',
-		'root'    => dirname(__DIR__),
+		'version' => (string) require __DIR__ . '/version.php',
+		'root'    => __DIR__,
 		// No psr-4 prefix: the package declares no classes.
 		'psr4'    => [],
 	]);

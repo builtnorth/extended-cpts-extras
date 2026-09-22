@@ -23,7 +23,7 @@ class ExtrasTest extends TestCase {
 		parent::setUp();
 
 		// Load the functions file
-		require_once dirname( dirname( __DIR__ ) ) . '/inc/functions/extras.php';
+		require_once dirname( dirname( __DIR__ ) ) . '/inc/public-api.php';
 
 		// extended_cpts_extras_featured_image_styles() is a function-local
 		// static registry — bust it so a post type registered by one test
