@@ -10,7 +10,8 @@
     }
   ],
   "require": {
-    "php": ">=8.1"
+    "php": ">=8.1",
+    "novalis/package-loader": "^1.0"
   },
   "require-dev": {
     "10up/wp_mock": "^1.0",
@@ -24,6 +25,7 @@
       "BuiltNorth\\ExtendedCPTsExtras\\": "inc/classes"
     },
     "files": [
+      "bootstrap/register.php",
       "inc/functions/extras.php",
       "inc/functions/modify.php"
     ]
