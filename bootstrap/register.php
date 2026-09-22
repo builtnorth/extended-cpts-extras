@@ -35,7 +35,5 @@ if (class_exists(Registry::class, false)) {
 		'root'    => dirname(__DIR__),
 		// No psr-4 prefix: the package declares no classes.
 		'psr4'    => [],
-		// Function-only package — nothing to start.
-		'boot'    => null,
 	]);
 }
